@@ -2,6 +2,7 @@ package com.example.sd118_nordic.controller;
 
 import com.example.sd118_nordic.entity.Mausac;
 import com.example.sd118_nordic.entity.Sanpham;
+import com.example.sd118_nordic.entity.Taikhoan;
 import com.example.sd118_nordic.repository.MausacRepository;
 import com.example.sd118_nordic.repository.SanphamRepository;
 import com.example.sd118_nordic.service.SanphamService;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -30,11 +32,15 @@ public class MausacController {
         model.addAttribute("listMauSac", listMauSac);
         return "mausac";
     }
-//
-//    @GetMapping("view-update/{id}")
-//    public String viewUpdate(@PathVariable("id") String id, Model model) {
-//        SanPham sanPham = sanPhamRepository.findById(UUID.fromString(id));
-//    }
+    @GetMapping("view-update/{id}")
+    public String viewUpdate(@PathVariable("id") UUID id, Model model) {
+        Optional<Mausac> mauSacOptional = mausacRepository.findById(id);
+        if (mauSacOptional.isPresent()) {
+            Mausac mauSac = mauSacOptional.get();
+            model.addAttribute("mauSac", mauSac);
+        }
+        return "updateMausac";
+    }
 
     @GetMapping("delete/{id}")
     public String delete(@PathVariable("id") String id) {
@@ -57,6 +63,19 @@ public class MausacController {
                 .tenMau(tenMau)
                 .trangThai(trangThai)
                 .build();
+        mausacRepository.save(mauSac);
+        return "redirect:/mausac/hien-thi";
+    }
+    @PostMapping("update")
+    public String updateMausac(@RequestParam("id") String id,
+                                 @RequestParam("ma") String ma,
+                                 @RequestParam("tenMau") String tenMau,
+                                 @RequestParam("trangThai") String trangThai) {
+        Mausac mauSac = mausacRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Mau sac Id: " + id));
+        mauSac.setMa(ma);
+        mauSac.setTenMau(tenMau);
+        mauSac.setTrangThai(Integer.valueOf(trangThai));
         mausacRepository.save(mauSac);
         return "redirect:/mausac/hien-thi";
     }

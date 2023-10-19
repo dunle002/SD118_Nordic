@@ -1,6 +1,7 @@
 package com.example.sd118_nordic.controller;
 
 import com.example.sd118_nordic.entity.Giamgia;
+import com.example.sd118_nordic.entity.Kichco;
 import com.example.sd118_nordic.entity.Taikhoan;
 import com.example.sd118_nordic.repository.GiamgiaRepository;
 import com.example.sd118_nordic.repository.TaikhoanRepository;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -31,11 +33,15 @@ public class GiamgiaController {
         model.addAttribute("listGiamGia", listGiamGia);
         return "giamgia";
     }
-//
-//    @GetMapping("view-update/{id}")
-//    public String viewUpdate(@PathVariable("id") String id, Model model) {
-//        SanPham sanPham = sanPhamRepository.findById(UUID.fromString(id));
-//    }
+    @GetMapping("view-update/{id}")
+    public String viewUpdate(@PathVariable("id") UUID id, Model model) {
+        Optional<Giamgia> giamGiaOptional = giamgiaRepository.findById(id);
+        if (giamGiaOptional.isPresent()) {
+            Giamgia giamGia = giamGiaOptional.get();
+            model.addAttribute("giamGia", giamGia);
+        }
+        return "updateGiamgia";
+    }
 
     @GetMapping("delete/{id}")
     public String delete(@PathVariable("id") String id) {
@@ -65,6 +71,25 @@ public class GiamgiaController {
                 .ngayKetThuc(Date.valueOf(ngayKetThuc))
                 .trangThai(trangThai)
                 .build();
+        giamgiaRepository.save(giamGia);
+        return "redirect:/giamgia/hien-thi";
+    }
+    @PostMapping("update")
+    public String updateTaikhoan(@RequestParam("id") String id,
+                                 @RequestParam("ma") String ma,
+                                 @RequestParam("loaiGiamGia") String loaiGiamGia,
+                                 @RequestParam("giaTriGiam") Long giaTriGiam,
+                                 @RequestParam("ngayBatDau") String ngayBatDau,
+                                 @RequestParam("ngayKetThuc") String ngayKetThuc,
+                                 @RequestParam("trangThai") String trangThai) {
+        Giamgia giamGia = giamgiaRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Giam gia Id: " + id));
+        giamGia.setMa(ma);
+        giamGia.setLoaiGiamGia(loaiGiamGia);
+        giamGia.setGiaTriGiam(BigDecimal.valueOf(giaTriGiam));
+        giamGia.setNgayBatDau(Date.valueOf(ngayBatDau));
+        giamGia.setNgayKetThuc(Date.valueOf(ngayKetThuc));
+        giamGia.setTrangThai(Integer.valueOf(trangThai));
         giamgiaRepository.save(giamGia);
         return "redirect:/giamgia/hien-thi";
     }

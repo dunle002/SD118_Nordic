@@ -1,6 +1,7 @@
 package com.example.sd118_nordic.controller;
 
 import com.example.sd118_nordic.entity.Chatlieu;
+import com.example.sd118_nordic.entity.Degiay;
 import com.example.sd118_nordic.entity.Sanpham;
 import com.example.sd118_nordic.repository.ChatlieuRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -37,6 +39,15 @@ public class ChatlieuController {
         model.addAttribute("chatLieu", chatlieu);
         return "addchatlieu";
     }
+    @GetMapping("view-update/{id}")
+    public String viewUpdate(@PathVariable("id") UUID id, Model model) {
+        Optional<Chatlieu> chatLieuOptional = chatlieuRepository.findById(id);
+        if (chatLieuOptional.isPresent()) {
+            Chatlieu chatLieu = chatLieuOptional.get();
+            model.addAttribute("chatLieu", chatLieu);
+        }
+        return "updateChatlieu";
+    }
     @PostMapping("add")
     public String addChatLieu(@RequestParam("ma") String ma, @RequestParam("tenChatLieu") String tenChatLieu,
                              @RequestParam("trangThai") Integer trangThai) {
@@ -45,6 +56,19 @@ public class ChatlieuController {
                 .tenChatLieu(tenChatLieu)
                 .trangThai(trangThai)
                 .build();
+        chatlieuRepository.save(chatlieu);
+        return "redirect:/chatlieu/hien-thi";
+    }
+    @PostMapping("update")
+    public String updateChatlieu(@RequestParam("id") String id,
+                                 @RequestParam("ma") String ma,
+                                 @RequestParam("tenChatLieu") String tenChatLieu,
+                                 @RequestParam("trangThai") String trangThai) {
+        Chatlieu chatlieu = chatlieuRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Chat lieu Id: " + id));
+        chatlieu.setMa(ma);
+        chatlieu.setTenChatLieu(tenChatLieu);
+        chatlieu.setTrangThai(Integer.valueOf(trangThai));
         chatlieuRepository.save(chatlieu);
         return "redirect:/chatlieu/hien-thi";
     }

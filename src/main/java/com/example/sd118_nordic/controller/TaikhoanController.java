@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -30,11 +31,17 @@ public class TaikhoanController {
         model.addAttribute("listTaiKhoan", listTaiKhoan);
         return "taikhoan";
     }
-//
-//    @GetMapping("view-update/{id}")
-//    public String viewUpdate(@PathVariable("id") String id, Model model) {
-//        SanPham sanPham = sanPhamRepository.findById(UUID.fromString(id));
-//    }
+
+    @GetMapping("view-update/{id}")
+    public String viewUpdate(@PathVariable("id") UUID id, Model model) {
+        Optional<Taikhoan> taiKhoanOptional = taikhoanRepository.findById(id);
+        if (taiKhoanOptional.isPresent()) {
+            Taikhoan taiKhoan = taiKhoanOptional.get();
+            model.addAttribute("taiKhoan", taiKhoan);
+        }
+        return "updateTaikhoan";
+    }
+
 
     @GetMapping("delete/{id}")
     public String delete(@PathVariable("id") String id) {
@@ -51,7 +58,7 @@ public class TaikhoanController {
 
     @PostMapping("add")
     public String addTaiKhoan(@RequestParam("userName") String userName,
-                             @RequestParam("password") String password,
+                              @RequestParam("password") String password,
                               @RequestParam("role") Boolean role) {
         Taikhoan taiKhoan = Taikhoan.builder()
                 .userName(userName)
@@ -59,6 +66,21 @@ public class TaikhoanController {
                 .role(role)
                 .build();
         taikhoanRepository.save(taiKhoan);
+        return "redirect:/taikhoan/hien-thi";
+    }
+
+    @PostMapping("update")
+    public String updateTaikhoan(@RequestParam("id") String id,
+                                 @RequestParam("userName") String userName,
+                                 @RequestParam("password") String password,
+                                 @RequestParam("role") String role) {
+        Taikhoan taiKhoan = taikhoanRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Taikhoan Id: " + id));
+        taiKhoan.setUserName(userName);
+        taiKhoan.setPassword(password);
+        taiKhoan.setRole(Boolean.valueOf(role));
+        taikhoanRepository.save(taiKhoan);
+
         return "redirect:/taikhoan/hien-thi";
     }
 //    @RequestMapping("/")

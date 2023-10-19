@@ -1,6 +1,7 @@
 package com.example.sd118_nordic.controller;
 
 import com.example.sd118_nordic.entity.Loaigiay;
+import com.example.sd118_nordic.entity.Mausac;
 import com.example.sd118_nordic.entity.Sanpham;
 import com.example.sd118_nordic.repository.LoaigiayRepository;
 import com.example.sd118_nordic.repository.SanphamRepository;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -30,11 +32,15 @@ public class LoaigiayController {
         model.addAttribute("listLoaiGiay", listLoaiGiay);
         return "loaigiay";
     }
-//
-//    @GetMapping("view-update/{id}")
-//    public String viewUpdate(@PathVariable("id") String id, Model model) {
-//        SanPham sanPham = sanPhamRepository.findById(UUID.fromString(id));
-//    }
+    @GetMapping("view-update/{id}")
+    public String viewUpdate(@PathVariable("id") UUID id, Model model) {
+        Optional<Loaigiay> loaiGiayOptional = loaigiayRepository.findById(id);
+        if (loaiGiayOptional.isPresent()) {
+            Loaigiay loaiGiay = loaiGiayOptional.get();
+            model.addAttribute("loaiGiay", loaiGiay);
+        }
+        return "updateLoaigiay";
+    }
 
     @GetMapping("delete/{id}")
     public String delete(@PathVariable("id") String id) {
@@ -57,6 +63,19 @@ public class LoaigiayController {
                 .tenTheLoai(tenTheLoai)
                 .trangThai(trangThai)
                 .build();
+        loaigiayRepository.save(loaiGiay);
+        return "redirect:/loaigiay/hien-thi";
+    }
+    @PostMapping("update")
+    public String updateLoaigiay(@RequestParam("id") String id,
+                                 @RequestParam("ma") String ma,
+                                 @RequestParam("tenTheLoai") String tenTheLoai,
+                                 @RequestParam("trangThai") String trangThai) {
+        Loaigiay loaiGiay = loaigiayRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Mau sac Id: " + id));
+        loaiGiay.setMa(ma);
+        loaiGiay.setTenTheLoai(tenTheLoai);
+        loaiGiay.setTrangThai(Integer.valueOf(trangThai));
         loaigiayRepository.save(loaiGiay);
         return "redirect:/loaigiay/hien-thi";
     }

@@ -31,11 +31,15 @@ public class SanphamController {
         model.addAttribute("listSanPham", listSanPham);
         return "sanpham";
     }
-//
-//    @GetMapping("view-update/{id}")
-//    public String viewUpdate(@PathVariable("id") String id, Model model) {
-//        SanPham sanPham = sanPhamRepository.findById(UUID.fromString(id));
-//    }
+    @GetMapping("view-update/{id}")
+    public String viewUpdate(@PathVariable("id") UUID id, Model model) {
+        Optional<Sanpham> sanPhamOptional = sanPhamRepository.findById(id);
+        if (sanPhamOptional.isPresent()) {
+            Sanpham sanPham = sanPhamOptional.get();
+            model.addAttribute("sanPham", sanPham);
+        }
+        return "updateSanpham";
+    }
 
     @GetMapping("delete/{id}")
     public String delete(@PathVariable("id") String id) {
@@ -61,6 +65,23 @@ public class SanphamController {
         sanPhamRepository.save(sanPham);
         return "redirect:/sanpham/hien-thi";
     }
+    @PostMapping("update")
+    public String updateSanPham(@RequestParam("id") String id,
+                                @RequestParam("ma") String ma,
+                                @RequestParam("tenSanPham") String tenSanPham,
+                                @RequestParam("trangThai") String trangThai) {
+        Sanpham sanPham = sanPhamRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new IllegalArgumentException("Invalid Sanpham Id: " + id));
+
+        sanPham.setMa(ma);
+        sanPham.setTenSanPham(tenSanPham);
+        sanPham.setTrangThai(Integer.valueOf(trangThai));
+
+        sanPhamRepository.save(sanPham);
+
+        return "redirect:/sanpham/hien-thi";
+    }
+
 //    @RequestMapping("/")
 ////    public String viewHomePage(Model model, @Param("keyword")String keyword) {
 ////        List<SanPham> list = service.listAll(keyword);

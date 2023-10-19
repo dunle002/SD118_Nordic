@@ -13,7 +13,7 @@
 <header><h2 style="text-align: center">Quản Lý Chất Liệu</h2></header>
 <main>
     <section class="container">
-        <a class="btn btn-danger" style="margin-right: 1050px;margin-top: 100px" href="/chatlieu/view-add">Thêm Sản Phẩm</a>
+        <a class="btn btn-danger" style="margin-right: 1050px;margin-top: 100px" href="/chatlieu/view-add">Thêm</a>
     </section>
     <div>
 <%--        <form class="search-bar__form" action="/product/list">--%>
